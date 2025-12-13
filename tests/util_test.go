@@ -51,7 +51,7 @@ func inspectNumGoroutines(t *testing.T, f func()) int {
 	})
 
 	wg.Wait()
-	return int(result.Load()) - 2
+	return int(result.Load()) - 4
 }
 
 type testCancel struct {

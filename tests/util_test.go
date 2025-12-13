@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"math"
+	"math/rand/v2"
 	"runtime"
 	"slices"
 	"strconv"
@@ -51,7 +52,7 @@ func inspectNumGoroutines(t *testing.T, f func()) int {
 	})
 
 	wg.Wait()
-	return int(result.Load()) - 2
+	return int(result.Load()) - 4
 }
 
 type testCancel struct {
@@ -114,6 +115,78 @@ func generateNumbers(n int) []int {
 
 	for i := 0; i < n; i++ {
 		s = append(s, i)
+	}
+
+	return s
+}
+
+func generateRandomNumbers(n int) []int {
+	s := make([]int, 0, n)
+
+	for i := 0; i < n; i++ {
+		s = append(s, rand.Int())
+	}
+
+	return s
+}
+
+var bigPrimes = []int{
+	481104029775070633,
+	361418009878219747,
+	278782527701719949,
+	94202811641458243,
+	148012909787975329,
+	5181163393781521,
+	662307880954325971,
+	12918594672593251,
+	543553609133614633,
+	28648862969413279,
+	2471479734586613,
+	431233961835794563,
+	296947929804523783,
+	4043921162318473,
+	930162235006969973,
+	8707615046238629,
+	43831789153245073,
+	5415369414548039,
+	52740892006036373,
+	1448383029161867,
+}
+
+var primes = []int{
+	2147483647,
+	2147483629,
+	2147483587,
+	2147483579,
+	2147483563,
+	2147483549,
+	2147483543,
+	2147483497,
+	2147483489,
+	2147483477,
+	2147483423,
+	2147483399,
+	2147483353,
+	2147483323,
+	2147483269,
+	2147483249,
+	2147483237,
+	2147483179,
+	2147483171,
+	2147483137,
+}
+
+func generatePrimesNumbers(n int) []int {
+	s := make([]int, 0, n)
+
+	if math.MaxInt == math.MaxInt64 {
+		for i := 0; i < n; i++ {
+			s = append(s, bigPrimes[i%len(bigPrimes)])
+		}
+	} else {
+		for i := 0; i < n; i++ {
+			s = append(s, primes[i%len(primes)])
+		}
 	}
 
 	return s

@@ -97,5 +97,5 @@ func TestWorkersCount(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	require.InDelta(t, gNum, factWorkers+writeWorkers, 50)
+	require.InDelta(t, gNum, factWorkers+writeWorkers, 10)
 }

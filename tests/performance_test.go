@@ -4,7 +4,6 @@ package fact
 
 import (
 	"context"
-	"math"
 	"runtime"
 	"runtime/debug"
 	"testing"
@@ -103,19 +102,24 @@ func TestWorkersCount(t *testing.T) {
 
 func TestDistributionPerformance(t *testing.T) {
 	deferrableLeakDetection(t)
-	bigPrimeN := primes[0]
-	if math.MaxInt == math.MaxInt64 {
-		bigPrimeN = 9223372036854775783
+	badPer := generatePrimesNumbers(3)
+	for i := 0; i < 6; i++ {
+		badPer = append(badPer, 1)
+	}
+	badPer2 := make([]int, 9)
+	for i := 0; i < 3; i++ {
+		badPer2 = append(badPer2, badPer[i])
+		badPer2 = append(badPer2, 1)
+		badPer2 = append(badPer2, 1)
 	}
 
 	first := testing.Benchmark(func(b *testing.B) {
 		ctx := context.Background()
 
 		fact := newFactorizer(t, 3, 3)
-		numbers := []int{bigPrimeN, bigPrimeN, bigPrimeN, 1, 1, 1, 1, 1, 1}
 
 		for b.Loop() {
-			err := fact.Factorize(ctx, numbers, newSleepWriter(time.Millisecond*100))
+			err := fact.Factorize(ctx, badPer, newSleepWriter(time.Millisecond*100))
 			require.NoError(t, err)
 		}
 	})
@@ -124,10 +128,9 @@ func TestDistributionPerformance(t *testing.T) {
 		ctx := context.Background()
 
 		fact := newFactorizer(t, 3, 3)
-		numbers := []int{bigPrimeN, 1, 1, bigPrimeN, 1, 1, bigPrimeN, 1, 1}
 
 		for b.Loop() {
-			err := fact.Factorize(ctx, numbers, newSleepWriter(time.Millisecond*100))
+			err := fact.Factorize(ctx, badPer2, newSleepWriter(time.Millisecond*100))
 			require.NoError(t, err)
 		}
 	})

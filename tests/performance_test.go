@@ -4,6 +4,7 @@ package fact
 
 import (
 	"context"
+	"math"
 	"runtime"
 	"runtime/debug"
 	"testing"
@@ -98,4 +99,39 @@ func TestWorkersCount(t *testing.T) {
 	})
 
 	require.InDelta(t, gNum, factWorkers+writeWorkers, 10)
+}
+
+func TestDistributionPerformance(t *testing.T) {
+	deferrableLeakDetection(t)
+	bigPrimeN := primes[0]
+	if math.MaxInt == math.MaxInt64 {
+		bigPrimeN = 9223372036854775783
+	}
+
+	first := testing.Benchmark(func(b *testing.B) {
+		ctx := context.Background()
+
+		fact := newFactorizer(t, 3, 3)
+		numbers := []int{bigPrimeN, bigPrimeN, bigPrimeN, 1, 1, 1, 1, 1, 1}
+
+		for b.Loop() {
+			err := fact.Factorize(ctx, numbers, newSleepWriter(time.Millisecond*100))
+			require.NoError(t, err)
+		}
+	})
+
+	second := testing.Benchmark(func(b *testing.B) {
+		ctx := context.Background()
+
+		fact := newFactorizer(t, 3, 3)
+		numbers := []int{bigPrimeN, 1, 1, bigPrimeN, 1, 1, bigPrimeN, 1, 1}
+
+		for b.Loop() {
+			err := fact.Factorize(ctx, numbers, newSleepWriter(time.Millisecond*100))
+			require.NoError(t, err)
+		}
+	})
+
+	require.LessOrEqual(t, float64(second.NsPerOp())/float64(first.NsPerOp()), 1.03)
+	require.LessOrEqual(t, float64(first.NsPerOp())/float64(second.NsPerOp()), 1.03)
 }

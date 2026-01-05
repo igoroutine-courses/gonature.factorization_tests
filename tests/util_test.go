@@ -252,6 +252,9 @@ func checkFactorization(num int, delimiters []int) bool {
 		tmp := d
 
 		if d < 0 {
+			if d != -1 {
+				return false
+			}
 			d *= -1
 		}
 

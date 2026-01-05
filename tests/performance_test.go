@@ -47,10 +47,12 @@ func TestFallbackPerformance(t *testing.T) {
 func TestGeneralPerformance(t *testing.T) {
 	deferrableLeakDetection(t)
 
+	numCpu := min(16, runtime.NumCPU())
+
 	first := testing.Benchmark(func(b *testing.B) {
 		ctx := context.Background()
 
-		fact := newFactorizer(t, max(2, runtime.NumCPU()), max(4, runtime.NumCPU()))
+		fact := newFactorizer(t, max(2, numCpu), max(4, numCpu))
 		numbers := generateNumbers(100)
 
 		for b.Loop() {
@@ -62,7 +64,7 @@ func TestGeneralPerformance(t *testing.T) {
 	second := testing.Benchmark(func(b *testing.B) {
 		ctx := context.Background()
 
-		fact := newFactorizer(t, max(2, runtime.NumCPU())/2, max(4, runtime.NumCPU())/4)
+		fact := newFactorizer(t, max(2, numCpu)/2, max(4, numCpu)/4)
 		numbers := generateNumbers(100)
 
 		for b.Loop() {
